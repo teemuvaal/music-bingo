@@ -5,6 +5,12 @@ from a Spotify playlist.
 
 ### How to run:
 
+Requires:
+random
+pandas
+matplotlib.pyplot
+numpy
+
 1. Use for example to create the extract: https://exportify.net to create a list of songs
 2. Place songs.csv to folder
 3. run with python bingo_generator.py or with notebook
