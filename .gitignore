@@ -2,6 +2,7 @@
 
 # dependencies
 songs.csv
+songs2.csv
 *.jpg
 *.xlsx
 *.docx
