@@ -1,8 +1,14 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
+# Python output
 songs.csv
 songs2.csv
 *.jpg
 *.xlsx
 *.docx
+
+# Next.js app
+nextjs-app/.next/
+nextjs-app/node_modules/
+nextjs-app/.env.local
+nextjs-app/tsconfig.tsbuildinfo
