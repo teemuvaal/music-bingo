@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
-import { parseCsv, generateCards, BingoCard, Song, DisplayMode } from "@/lib/bingo";
+import { useState, useRef, useCallback, useMemo } from "react";
+import { parseCsv, generateCards, estimateSongsForBingo, BingoCard, Song, DisplayMode } from "@/lib/bingo";
 import BingoCardComponent from "@/components/BingoCard";
 
 type Params = {
@@ -75,6 +75,10 @@ export default function AppPage() {
 
   const cellsPerCard = params.gridSize * params.gridSize;
   const canGenerate = songs.length >= cellsPerCard;
+  const estimatedSongs = useMemo(
+    () => estimateSongsForBingo(params.gridSize, params.poolSize),
+    [params.gridSize, params.poolSize]
+  );
 
   return (
     <div className="space-y-8">
@@ -220,6 +224,17 @@ export default function AppPage() {
                   <NumBadge>{params.poolSize}</NumBadge>
                 </div>
               </ParamRow>
+
+              {/* Bingo estimate */}
+              <div className="rounded-lg bg-purple-50 border border-purple-100 px-3 py-2.5 text-xs text-purple-800 space-y-0.5">
+                <div className="font-semibold">
+                  ~{estimatedSongs} songs until likely bingo
+                </div>
+                <div className="text-purple-600 leading-snug">
+                  Median estimate per card — with a {params.gridSize}×{params.gridSize} grid and pool of {params.poolSize}.
+                  {estimatedSongs > 40 && " Consider a smaller grid or pool for shorter games."}
+                </div>
+              </div>
 
               {/* Display mode */}
               <ParamRow label="Display mode" hint="What to show in each cell">

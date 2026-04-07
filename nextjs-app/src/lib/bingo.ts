@@ -111,6 +111,41 @@ function sampleWithoutReplacement<T>(arr: T[], n: number): T[] {
   return result;
 }
 
+/**
+ * Estimates the median number of songs that need to be played before a single
+ * card gets a bingo (completes any row, column, or diagonal).
+ *
+ * Uses exact hypergeometric probability for a single line:
+ *   P(line of N complete within k draws from pool P) = ∏(i=0..N-1) (k-i)/(P-i)
+ *
+ * Treats all L = 2N+2 lines as independent (slight overestimate since shared
+ * cells create positive correlation, so actual bingo tends to happen a little
+ * sooner than reported).
+ */
+export function estimateSongsForBingo(gridSize: number, poolSize: number): number {
+  const N = gridSize;
+  const P = poolSize;
+  if (P < N * N) return P;
+
+  const L = 2 * N + 2; // N rows + N cols + 2 diagonals
+
+  function pLineComplete(k: number): number {
+    let p = 1;
+    for (let i = 0; i < N; i++) p *= (k - i) / (P - i);
+    return Math.max(0, p);
+  }
+
+  // Binary search for 50th-percentile (median) k
+  let lo = N, hi = P;
+  while (lo < hi) {
+    const mid = Math.floor((lo + hi) / 2);
+    const pBingo = 1 - Math.pow(1 - pLineComplete(mid), L);
+    if (pBingo < 0.5) lo = mid + 1;
+    else hi = mid;
+  }
+  return lo;
+}
+
 export function generateCards(songs: Song[], params: GeneratorParams): BingoCard[] {
   const { numCards, gridSize, poolSize, displayMode } = params;
   const cellsPerCard = gridSize * gridSize;
