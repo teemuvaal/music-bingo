@@ -88,7 +88,7 @@ export default function AppPage() {
 
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Left panel: upload + config */}
-        <div className="lg:col-span-1 space-y-5">
+        <div className="lg:col-span-1 space-y-5 print:hidden">
 
           {/* Upload */}
           <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
@@ -280,7 +280,7 @@ export default function AppPage() {
         </div>
 
         {/* Right panel: cards preview */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 print:col-span-full">
           {cards.length === 0 ? (
             <div className="flex items-center justify-center h-64 bg-white rounded-xl border-2 border-dashed border-gray-200 text-center p-8">
               <div>
@@ -306,7 +306,7 @@ export default function AppPage() {
                   Regenerate
                 </button>
               </div>
-              <div className="grid sm:grid-cols-2 gap-4 print:grid-cols-2 print:gap-6">
+              <div id="bingo-cards-grid" className="grid sm:grid-cols-2 gap-4 print:grid-cols-2 print:gap-8">
                 {cards.map((card) => (
                   <BingoCardComponent
                     key={card.id}
@@ -322,7 +322,7 @@ export default function AppPage() {
 
       {/* Song list preview */}
       {songs.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden print:hidden">
           <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
             <h2 className="font-semibold text-gray-800 text-sm">
               Song List Preview

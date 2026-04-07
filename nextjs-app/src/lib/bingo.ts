@@ -36,13 +36,21 @@ export function parseCsv(raw: string): Song[] {
   const headerIndex = firstLower.includes("track") || firstLower.includes("song") || firstLower.includes("artist") ? 0 : -1;
 
   // Find column indices from header if present
-  let numCol = 0, trackCol = 1, artistCol = 2;
+  // Exportify defaults: col 0 = Spotify ID, col 1 = Track Name, col 2 = Artist IDs, col 3 = Artist Name(s)
+  let numCol = 0, trackCol = 1, artistCol = 3;
   if (headerIndex === 0) {
     const headers = firstLine.split(delimiter).map((h) => h.trim().toLowerCase().replace(/"/g, ""));
     // Try to find by name
     const numIdx = headers.findIndex((h) => h === "num" || h === "#" || h === "number");
-    const trackIdx = headers.findIndex((h) => h.includes("track") || h.includes("name") || h.includes("title") || h.includes("song"));
-    const artistIdx = headers.findIndex((h) => h.includes("artist"));
+    const trackIdx = headers.findIndex((h) => h.includes("track") || h.includes("title") || h.includes("song"));
+    // Prefer "artist name(s)" over "artist id/uri" columns
+    let artistIdx = headers.findIndex((h) => h.includes("artist") && h.includes("name"));
+    if (artistIdx === -1) {
+      artistIdx = headers.findIndex((h) => h.includes("artist") && !h.includes("id") && !h.includes("uri") && !h.includes("url"));
+    }
+    if (artistIdx === -1) {
+      artistIdx = headers.findIndex((h) => h.includes("artist"));
+    }
     if (numIdx !== -1) numCol = numIdx;
     if (trackIdx !== -1) trackCol = trackIdx;
     if (artistIdx !== -1) artistCol = artistIdx;

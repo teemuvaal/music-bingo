@@ -26,10 +26,40 @@ body {
 }
 
 @media print {
-  body > * { display: none !important; }
-  body > div > main { display: block !important; }
+  /*
+   * visibility: hidden on body hides everything, but visibility: visible
+   * on a child CAN override the parent — unlike display:none which cannot.
+   * This is the reliable cross-browser print isolation pattern.
+   */
+  body * {
+    visibility: hidden !important;
+  }
 
-  header, nav, aside, button, .no-print { display: none !important; }
+  #bingo-cards-grid,
+  #bingo-cards-grid * {
+    visibility: visible !important;
+  }
 
-  .print\:break-inside-avoid { break-inside: avoid; }
+  #bingo-cards-grid {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 10mm;
+    box-sizing: border-box;
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8mm;
+    background: white;
+  }
+
+  .print\:break-inside-avoid {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  @page {
+    margin: 0;
+    size: A4 portrait;
+  }
 }
