@@ -1,36 +1,105 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Music Bingo Generator
 
-## Getting Started
+A web app for generating printable music bingo cards from a Spotify playlist CSV export. Upload your playlist, configure the grid, and print a unique card for every player at your quiz night.
 
-First, run the development server:
+## Features
+
+- Upload a Spotify playlist exported via [Exportify](https://exportify.net)
+- Configure grid size (3×3, 4×4, 5×5), number of cards, and song pool size
+- Show artist name, track name, or both on each cell
+- Estimates how many songs you need to play before someone gets bingo
+- Print all cards as a PDF — 2 per page, ready to hand out
+
+## Requirements
+
+- Node.js 18+
+- pnpm (or npm/yarn)
+
+## Setup
+
+### 1. Install dependencies
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Create `.env.local`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create a file called `.env.local` in the project root with the following variables:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+# Login credentials for the app (simple single-user auth)
+APP_USERNAME=admin
+APP_PASSWORD=your-password-here
 
-## Learn More
+# Secret used to sign session JWTs — generate a random string, e.g.:
+# openssl rand -base64 32
+NEXTAUTH_SECRET=your-random-secret-here
+```
 
-To learn more about Next.js, take a look at the following resources:
+| Variable | Required | Description |
+|---|---|---|
+| `APP_USERNAME` | No | Username for login. Defaults to `admin` if not set. |
+| `APP_PASSWORD` | No | Password for login. Defaults to `bingo2024` if not set. |
+| `NEXTAUTH_SECRET` | **Yes** | Random secret for signing session tokens. Must be set in production. |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+To generate a secure `NEXTAUTH_SECRET`:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+openssl rand -base64 32
+```
 
-## Deploy on Vercel
+### 3. Run the dev server
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+pnpm dev
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Open [http://localhost:3000](http://localhost:3000). You'll be redirected to the login page — sign in with the credentials from your `.env.local`.
+
+## Getting a Spotify playlist CSV
+
+1. Go to [exportify.net](https://exportify.net)
+2. Log in with your Spotify account
+3. Click **Export** next to the playlist you want
+4. Save the `.csv` file
+
+The app expects the Exportify format. Columns used:
+- Column 2 (index 1): Track Name
+- Column 4 (index 3): Artist Name(s)
+
+Other CSV formats will also work if the file has a header row containing the words `track` and `artist` — the parser will auto-detect the right columns.
+
+## Printing cards
+
+1. Upload your CSV and configure the settings
+2. Click **Generate Cards**
+3. Click **Print / Save as PDF**
+4. In the browser print dialog, choose **Save as PDF** and print
+
+Cards are formatted 2-up on A4, with borders sized for easy reading when handed out at a quiz.
+
+## Project structure
+
+```
+src/
+  app/
+    app/          # Protected generator page and layout
+    login/        # Login page
+    globals.css   # Global styles + print media query
+  components/
+    AppNav.tsx    # Top navigation bar
+    BingoCard.tsx # Individual bingo card component
+  lib/
+    auth.ts       # NextAuth config (credentials provider)
+    bingo.ts      # CSV parsing, card generation, bingo estimate
+```
+
+## Building for production
+
+```bash
+pnpm build
+pnpm start
+```
+
+Make sure `NEXTAUTH_SECRET` is set to a strong random value in your production environment.
